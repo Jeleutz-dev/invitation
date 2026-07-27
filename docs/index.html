@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movie Date RSVP</title>
-    <link rel="icon" type="image/png" href="./assets/spideyyy.png">
+    <!-- Dynamic Favicon (Defaults to Spiderman) -->
+    <link rel="icon" id="pageIcon" type="image/png" href="./assets/spideyyy.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Using Playfair Display for an elegant RSVP look -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
     
     <style>
@@ -19,7 +19,7 @@
             justify-content: center;
             align-items: center;
             
-            /* Add the background image here */
+            /* Default Spiderman Background */
             background-image: url('./assets/wallpaper/spiderman_bg.png');
             background-size: cover;
             background-position: center;
@@ -110,8 +110,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            
-            /* Smooth fade in */
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.4s ease, visibility 0.4s ease;
@@ -144,7 +142,6 @@
             width: 100vw; 
             height: 100vh;
             object-fit: cover;
-            /* Layered IN FRONT of the modal to correctly "pull" it */
             z-index: 3; 
             pointer-events: none;
             opacity: 0;
@@ -164,33 +161,23 @@
             max-width: 400px;
             box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5); 
             color: #f5f5f5; 
-            
-            /* Hidden until pulled by the web */
             opacity: 0; 
         }
 
         /* --- THE ANIMATION TIMELINE --- */
-        
-        /* Phase 1: Shoot from camera to screen */
         @keyframes shootWeb {
             0% { transform: translate(-50%, -50%) scale(4); opacity: 0; }
             20% { opacity: 1; }
             100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
         }
-
-        /* Phase 2: Splat against the screen */
         @keyframes splatIn {
             0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
             100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
         }
-
-        /* Phase 3: Webs zoom out toward the camera and fade out gracefully */
         @keyframes pullOutWeb {
             0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
             100% { transform: translate(-70%, 60%) scale(5); opacity: 0; }
         }
-
-        /* Phase 3: Modal is pulled from the screen toward the camera */
         @keyframes pullModal {
             0% { transform: scale(0.2); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
@@ -203,16 +190,34 @@
             color: #ff4d4d; 
             text-shadow: 0 0 10px rgba(255, 77, 77, 0.3);
         }
+
+        /* --- DOOMSDAY THEME OVERRIDES --- */
+        body.doomsday-theme {
+            background-image: url('./assets/wallpaper/doomsday_bg.png');
+        }
+        .doomsday-theme .highlight {
+            color: #2ecc71; /* Doom Green */
+            text-shadow: 0 0 10px rgba(46, 204, 113, 0.3);
+        }
+        .doomsday-theme .btn-yes {
+            background-color: #1e5631; 
+            box-shadow: 0 4px 15px rgba(30, 86, 49, 0.3);
+        }
+        .doomsday-theme .btn-yes:hover {
+            background-color: #143d22;
+        }
+        .doomsday-theme .modal-title {
+            color: #2ecc71;
+            text-shadow: 0 0 10px rgba(46, 204, 113, 0.3);
+        }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <!-- Added id="inviteTitle" -->
         <h1 id="inviteTitle">Will you go on a movie date with me? <br><em>I bought tickets!</em></h1>
         
         <div class="details">
-            <!-- Added id="movieName", id="dateTime", and id="locationPlace" -->
             <p><strong>Movie:</strong> <span class="highlight" id="movieName">Spiderman: Brand New Day</span></p>
             <p><strong>Date & Time:</strong> <span id="dateTime">July 31, 2026 @ 9:15 PM</span></p>
             <p><strong>Location:</strong> <span id="locationPlace">SM MOA ScreenX</span></p>
@@ -238,17 +243,26 @@
         </div>
     </div>
     
-<script>
+    <script>
         // --- URL PARAMETER LOGIC ---
-        // This grabs any custom text packed into the web link
         const params = new URLSearchParams(window.location.search);
         
         if (params.has('name')) {
             document.getElementById('inviteTitle').innerHTML = params.get('name') + ", will you go on a movie date with me? <br><em>I bought tickets!</em>";
         }
-        if (params.has('movie')) {
-            document.getElementById('movieName').textContent = params.get('movie');
+
+        // --- THEME SWAP LOGIC ---
+        const movieChoice = params.get('movie');
+        if (movieChoice) {
+            document.getElementById('movieName').textContent = movieChoice;
+            
+            // If they picked Doomsday, swap the background, icon, and colors
+            if (movieChoice === 'Avengers: Doomsday') {
+                document.body.classList.add('doomsday-theme');
+                document.getElementById('pageIcon').href = "./assets/doomsday_icon.png";
+            }
         }
+
         if (params.has('date')) {
             document.getElementById('dateTime').textContent = params.get('date');
         }
@@ -260,9 +274,9 @@
         }
 
         // --- CHECK ANIMATION PREFERENCE ---
-        // Defaults to true, but switches to false if the URL says anim=false
         let enableSpidey = true;
-        if (params.has('anim') && params.get('anim') === 'false') {
+        // Turn off webs automatically if the movie is Doomsday
+        if (movieChoice === 'Avengers: Doomsday') {
             enableSpidey = false;
         }
         // ---------------------------
@@ -274,21 +288,16 @@
         const web2 = document.getElementById('web2');
         const modalContent = document.querySelector('.modal-content');
 
-        // Variables to store our timers so we can cancel them if needed
         let splatTimer, pullTimer;
 
         // The Smooth "Runaway" No Button Logic
         noBtn.addEventListener('mouseover', function() {
             if (this.style.position !== 'fixed') {
                 const rect = this.getBoundingClientRect();
-                
-                // Detach from the .card and attach directly to the <body>
                 document.body.appendChild(this);
-
                 this.style.position = 'fixed';
                 this.style.left = rect.left + 'px';
                 this.style.top = rect.top + 'px';
-                
                 this.getBoundingClientRect(); 
             }
 
@@ -304,31 +313,23 @@
 
         // The "Yes" Button Action Sequence
         yesBtn.addEventListener('click', function() {
-            // 1. Reset everything first in case they are clicking it a second time
             web1.style.animation = 'none';
             web2.style.animation = 'none';
             modalContent.style.animation = 'none';
-            
-            // Force the browser to register the reset before animating again (Reflow hack)
             void web1.offsetWidth; 
 
-            // 2. Activate overlay
             modal.classList.add('active');
             
-            // 3. Branch based on generator checkbox
             if (enableSpidey) {
                 // RUN FULL SPIDERMAN ANIMATION
                 web1.style.animation = 'shootWeb 0.25s ease-out forwards';
-                
                 splatTimer = setTimeout(() => {
                     web2.style.animation = 'splatIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
-                    
                     pullTimer = setTimeout(() => {
                         web1.style.animation = 'pullOutWeb 0.25s ease-in forwards';
                         web2.style.animation = 'pullOutWeb 0.25s ease-in forwards';
                         modalContent.style.animation = 'pullModal 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
                     }, 250); 
-                    
                 }, 250); 
             } else {
                 // SKIP WEBS, JUST POP THE MODAL OPEN
@@ -336,25 +337,17 @@
             }
         });
 
-        // --- Close Modal on Outside Click ---
+        // Close Modal on Outside Click
         modal.addEventListener('click', function(e) {
-            // We check if the thing clicked was exactly the dark overlay, 
-            // and NOT the white text card inside it.
             if (e.target === modal) {
-                // Hide the modal
                 modal.classList.remove('active');
-                
-                // Cancel any animations that might still be running
                 clearTimeout(splatTimer);
                 clearTimeout(pullTimer);
-
-                // Strip the animation styles so it resets to the beginning state
                 web1.style.animation = 'none';
                 web2.style.animation = 'none';
                 modalContent.style.animation = 'none';
             }
         });
-</script>
-    
+    </script>
 </body>
 </html>
