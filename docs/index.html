@@ -238,7 +238,7 @@
         </div>
     </div>
     
-    <script>
+<script>
         // --- URL PARAMETER LOGIC ---
         // This grabs any custom text packed into the web link
         const params = new URLSearchParams(window.location.search);
@@ -263,6 +263,12 @@
         const noBtn = document.getElementById('noBtn');
         const yesBtn = document.getElementById('yesBtn');
         const modal = document.getElementById('successModal');
+        const web1 = document.getElementById('web1');
+        const web2 = document.getElementById('web2');
+        const modalContent = document.querySelector('.modal-content');
+
+        // Variables to store our timers so we can cancel them if needed
+        let splatTimer, pullTimer;
 
         // The Smooth "Runaway" No Button Logic
         noBtn.addEventListener('mouseover', function() {
@@ -291,31 +297,51 @@
 
         // The "Yes" Button Action Sequence
         yesBtn.addEventListener('click', function() {
-            const web1 = document.getElementById('web1');
-            const web2 = document.getElementById('web2');
-            const modalContent = document.querySelector('.modal-content');
+            // 1. Reset everything first in case they are clicking it a second time
+            web1.style.animation = 'none';
+            web2.style.animation = 'none';
+            modalContent.style.animation = 'none';
             
-            // Activate overlay immediately to darken the background
+            // Force the browser to register the reset before animating again (Reflow hack)
+            void web1.offsetWidth; 
+
+            // 2. Activate overlay
             modal.classList.add('active');
             
-            // Phase 1: Shoot web1 (Duration: 0.5s)
+            // 3. Phase 1: Shoot web1
             web1.style.animation = 'shootWeb 0.25s ease-out forwards';
             
-            // Phase 2: Wait 0.5s, then Splat web2 (Duration: 0.5s)
-            setTimeout(() => {
+            // 4. Phase 2: Wait 0.25s, then Splat web2
+            splatTimer = setTimeout(() => {
                 web2.style.animation = 'splatIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
                 
-                // Phase 3: Wait 0.5s, then fade webs out while pulling modal in
-                setTimeout(() => {
+                // 5. Phase 3: Wait 0.25s, then pull modal in
+                pullTimer = setTimeout(() => {
                     web1.style.animation = 'pullOutWeb 0.25s ease-in forwards';
                     web2.style.animation = 'pullOutWeb 0.25s ease-in forwards';
-                    
-                    // The modal uses the elastic bezier curve to "pop" into its final place
                     modalContent.style.animation = 'pullModal 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
-                    
                 }, 250); 
                 
             }, 250); 
+        });
+
+        // --- NEW: Close Modal on Outside Click ---
+        modal.addEventListener('click', function(e) {
+            // We check if the thing clicked was exactly the dark overlay, 
+            // and NOT the white text card inside it.
+            if (e.target === modal) {
+                // Hide the modal
+                modal.classList.remove('active');
+                
+                // Cancel any animations that might still be running
+                clearTimeout(splatTimer);
+                clearTimeout(pullTimer);
+
+                // Strip the animation styles so it resets to the beginning state
+                web1.style.animation = 'none';
+                web2.style.animation = 'none';
+                modalContent.style.animation = 'none';
+            }
         });
     </script>
 </body>
