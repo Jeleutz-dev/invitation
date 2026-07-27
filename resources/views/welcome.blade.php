@@ -208,12 +208,14 @@
 <body>
 
     <div class="card">
-        <h1>Will you go on a movie date with me? <br><em>I bought tickets!</em></h1>
+        <!-- Added id="inviteTitle" -->
+        <h1 id="inviteTitle">Will you go on a movie date with me? <br><em>I bought tickets!</em></h1>
         
         <div class="details">
-            <p><strong>Movie:</strong> <span class="highlight">Spiderman: Brand New Day</span></p>
-            <p><strong>Date & Time:</strong> July 31, 2026 @ 9:15 PM</p>
-            <p><strong>Location:</strong> SM MOA ScreenX</p>
+            <!-- Added id="movieName", id="dateTime", and id="locationPlace" -->
+            <p><strong>Movie:</strong> <span class="highlight" id="movieName">Spiderman: Brand New Day</span></p>
+            <p><strong>Date & Time:</strong> <span id="dateTime">July 31, 2026 @ 9:15 PM</span></p>
+            <p><strong>Location:</strong> <span id="locationPlace">SM MOA ScreenX</span></p>
         </div>
 
         <div class="buttons">
@@ -237,6 +239,27 @@
     </div>
     
     <script>
+        // --- URL PARAMETER LOGIC ---
+        // This grabs any custom text packed into the web link
+        const params = new URLSearchParams(window.location.search);
+        
+        if (params.has('name')) {
+            document.getElementById('inviteTitle').innerHTML = params.get('name') + ", will you go on a movie date with me? <br><em>I bought tickets!</em>";
+        }
+        if (params.has('movie')) {
+            document.getElementById('movieName').textContent = params.get('movie');
+        }
+        if (params.has('date')) {
+            document.getElementById('dateTime').textContent = params.get('date');
+        }
+        if (params.has('loc')) {
+            document.getElementById('locationPlace').textContent = params.get('loc');
+        }
+        if (params.has('msg')) {
+            document.getElementById('modalMessage').innerHTML = params.get('msg');
+        }
+        // ---------------------------
+        
         const noBtn = document.getElementById('noBtn');
         const yesBtn = document.getElementById('yesBtn');
         const modal = document.getElementById('successModal');
