@@ -113,7 +113,7 @@
             if(msg) params.append('msg', msg);
 
             // 3. Figure out the base URL (so it works on localhost or GitHub pages automatically)
-            let baseUrl = window.location.href.split('generator.html')[0];
+            let baseUrl = window.location.href.split('web-generator')[0];
             
             // 4. Combine them
             const finalUrl = baseUrl + '?' + params.toString();
