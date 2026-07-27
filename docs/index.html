@@ -258,6 +258,13 @@
         if (params.has('msg')) {
             document.getElementById('modalMessage').innerHTML = params.get('msg');
         }
+
+        // --- CHECK ANIMATION PREFERENCE ---
+        // Defaults to true, but switches to false if the URL says anim=false
+        let enableSpidey = true;
+        if (params.has('anim') && params.get('anim') === 'false') {
+            enableSpidey = false;
+        }
         // ---------------------------
         
         const noBtn = document.getElementById('noBtn');
@@ -308,24 +315,28 @@
             // 2. Activate overlay
             modal.classList.add('active');
             
-            // 3. Phase 1: Shoot web1
-            web1.style.animation = 'shootWeb 0.25s ease-out forwards';
-            
-            // 4. Phase 2: Wait 0.25s, then Splat web2
-            splatTimer = setTimeout(() => {
-                web2.style.animation = 'splatIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+            // 3. Branch based on generator checkbox
+            if (enableSpidey) {
+                // RUN FULL SPIDERMAN ANIMATION
+                web1.style.animation = 'shootWeb 0.25s ease-out forwards';
                 
-                // 5. Phase 3: Wait 0.25s, then pull modal in
-                pullTimer = setTimeout(() => {
-                    web1.style.animation = 'pullOutWeb 0.25s ease-in forwards';
-                    web2.style.animation = 'pullOutWeb 0.25s ease-in forwards';
-                    modalContent.style.animation = 'pullModal 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+                splatTimer = setTimeout(() => {
+                    web2.style.animation = 'splatIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+                    
+                    pullTimer = setTimeout(() => {
+                        web1.style.animation = 'pullOutWeb 0.25s ease-in forwards';
+                        web2.style.animation = 'pullOutWeb 0.25s ease-in forwards';
+                        modalContent.style.animation = 'pullModal 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+                    }, 250); 
+                    
                 }, 250); 
-                
-            }, 250); 
+            } else {
+                // SKIP WEBS, JUST POP THE MODAL OPEN
+                modalContent.style.animation = 'pullModal 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+            }
         });
 
-        // --- NEW: Close Modal on Outside Click ---
+        // --- Close Modal on Outside Click ---
         modal.addEventListener('click', function(e) {
             // We check if the thing clicked was exactly the dark overlay, 
             // and NOT the white text card inside it.
@@ -343,6 +354,7 @@
                 modalContent.style.animation = 'none';
             }
         });
-    </script>
+</script>
+    
 </body>
 </html>
