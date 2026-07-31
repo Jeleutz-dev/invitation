@@ -247,8 +247,15 @@
         // --- URL PARAMETER LOGIC ---
         const params = new URLSearchParams(window.location.search);
         
+        // --- NEW: Custom Question Logic ---
+        let mainQ = params.get('mainQ') || "will you go on a movie date with me?";
+        let subQ = params.get('subQ') || "I bought tickets!";
+
         if (params.has('name')) {
-            document.getElementById('inviteTitle').innerHTML = params.get('name') + ", will you go on a movie date with me? <br><em>I bought tickets!</em>";
+            document.getElementById('inviteTitle').innerHTML = params.get('name') + ", " + mainQ + " <br><em>" + subQ + "</em>";
+        } else {
+            let displayMain = params.has('mainQ') ? params.get('mainQ') : "Will you go on a movie date with me?";
+            document.getElementById('inviteTitle').innerHTML = displayMain + " <br><em>" + subQ + "</em>";
         }
 
         // --- THEME SWAP LOGIC ---
