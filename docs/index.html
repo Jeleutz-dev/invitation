@@ -219,8 +219,8 @@
         
         <div class="details">
             <p><strong>Movie:</strong> <span class="highlight" id="movieName">Spiderman: Brand New Day</span></p>
-            <p><strong>Date & Time:</strong> <span id="dateTime">July 31, 2026 @ 9:15 PM</span></p>
-            <p><strong>Location:</strong> <span id="locationPlace">SM MOA ScreenX</span></p>
+            <p id="dateLine"><strong>Date & Time:</strong> <span id="dateTime">July 31, 2026 @ 9:15 PM</span></p>
+            <p id="locLine"><strong>Location:</strong> <span id="locationPlace">SM MOA ScreenX</span></p>
         </div>
 
         <div class="buttons">
@@ -263,12 +263,23 @@
             }
         }
 
-        if (params.has('date')) {
-            document.getElementById('dateTime').textContent = params.get('date');
+        // --- DATE & LOCATION VISIBILITY LOGIC ---
+        if (window.location.search) {
+            const dateVal = params.get('date');
+            if (!dateVal || dateVal.trim() === "") {
+                document.getElementById('dateLine').style.display = 'none';
+            } else {
+                document.getElementById('dateTime').textContent = dateVal;
+            }
+
+            const locVal = params.get('loc');
+            if (!locVal || locVal.trim() === "") {
+                document.getElementById('locLine').style.display = 'none';
+            } else {
+                document.getElementById('locationPlace').textContent = locVal;
+            }
         }
-        if (params.has('loc')) {
-            document.getElementById('locationPlace').textContent = params.get('loc');
-        }
+        
         if (params.has('msg')) {
             document.getElementById('modalMessage').innerHTML = params.get('msg');
         }
