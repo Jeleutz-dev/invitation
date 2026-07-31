@@ -80,6 +80,12 @@
         <label>Invitee's Name</label>
         <input type="text" id="genName" placeholder="e.g., Erika">
         
+        <label>Main Question (Optional)</label>
+        <input type="text" id="genMainQ" placeholder="e.g., will you go on a movie date with me?">
+        
+        <label>Sub Text (Optional)</label>
+        <input type="text" id="genSubQ" placeholder="e.g., I bought tickets!">
+        
         <label>Movie Title</label>
         <select id="genMovie">
             <option value="Spiderman: Brand New Day">Spiderman: Brand New Day</option>
@@ -111,9 +117,14 @@
             const date = document.getElementById('genDate').value;
             const loc = document.getElementById('genLoc').value;
             const msg = document.getElementById('genMsg').value;
+            const mainQ = document.getElementById('genMainQ').value;
+            const subQ = document.getElementById('genSubQ').value;
 
             const params = new URLSearchParams();
+            
             if(name) params.append('name', name);
+            if(mainQ) params.append('mainQ', mainQ);
+            if(subQ) params.append('subQ', subQ);
             if(movie) params.append('movie', movie);
             if(date) params.append('date', date);
             if(loc) params.append('loc', loc);
