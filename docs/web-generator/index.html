@@ -131,8 +131,9 @@
             // 3. Convert object to a string, make URL safe, and scramble (Base64 Encode)
             const encodedString = btoa(encodeURIComponent(JSON.stringify(inviteData)));
 
-            // 4. Set your LIVE GitHub Pages URL here so the generator makes valid links
-            let baseUrl = 'https://jeleutz-dev.github.io/';
+            // 4. Set to your exact GitHub repository URL
+            let baseUrl = 'https://jeleutz-dev.github.io/invitation/';
+            
             const finalUrl = baseUrl + '?invite=' + encodedString;
             
             const resultBox = document.getElementById('resultBox');
