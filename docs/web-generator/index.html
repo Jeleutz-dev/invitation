@@ -112,26 +112,28 @@
 
     <script>
         function generateLink() {
-            const name = document.getElementById('genName').value;
-            const movie = document.getElementById('genMovie').value;
-            const date = document.getElementById('genDate').value;
-            const loc = document.getElementById('genLoc').value;
-            const msg = document.getElementById('genMsg').value;
-            const mainQ = document.getElementById('genMainQ').value;
-            const subQ = document.getElementById('genSubQ').value;
+            // 1. Gather all inputs into a single object
+            const inviteData = {
+                name: document.getElementById('genName').value,
+                movie: document.getElementById('genMovie').value,
+                date: document.getElementById('genDate').value,
+                loc: document.getElementById('genLoc').value,
+                msg: document.getElementById('genMsg').value,
+                mainQ: document.getElementById('genMainQ').value,
+                subQ: document.getElementById('genSubQ').value
+            };
 
-            const params = new URLSearchParams();
-            
-            if(name) params.append('name', name);
-            if(mainQ) params.append('mainQ', mainQ);
-            if(subQ) params.append('subQ', subQ);
-            if(movie) params.append('movie', movie);
-            if(date) params.append('date', date);
-            if(loc) params.append('loc', loc);
-            if(msg) params.append('msg', msg);
+            // 2. Clean out any empty values so the link doesn't get unnecessarily long
+            Object.keys(inviteData).forEach(key => {
+                if (!inviteData[key]) delete inviteData[key];
+            });
 
-            let baseUrl = window.location.href.split('web-generator')[0];
-            const finalUrl = baseUrl + '?' + params.toString();
+            // 3. Convert object to a string, make URL safe, and scramble (Base64 Encode)
+            const encodedString = btoa(encodeURIComponent(JSON.stringify(inviteData)));
+
+            // 4. Set your LIVE GitHub Pages URL here so the generator makes valid links
+            let baseUrl = 'https://jeleutz-dev.github.io/';
+            const finalUrl = baseUrl + '?invite=' + encodedString;
             
             const resultBox = document.getElementById('resultBox');
             const resultLink = document.getElementById('resultLink');
