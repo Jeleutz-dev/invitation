@@ -244,22 +244,45 @@
     </div>
     
     <script>
-        // --- URL PARAMETER LOGIC ---
+        // --- URL PARAMETER LOGIC (WITH BASE64 DECODING) ---
         const params = new URLSearchParams(window.location.search);
+        let customData = {};
+
+        // 1. Check if the URL uses the new scrambled "?invite=" format
+        if (params.has('invite')) {
+            try {
+                // Decode the Base64 string back into a workable Object
+                const decodedString = decodeURIComponent(atob(params.get('invite')));
+                customData = JSON.parse(decodedString);
+            } catch (e) {
+                console.error("Invalid invite code");
+            }
+        } else {
+            // 2. FALLBACK: If it's an old link, grab data the old way so we don't break existing invites
+            customData = {
+                name: params.get('name'),
+                movie: params.get('movie'),
+                date: params.get('date'),
+                loc: params.get('loc'),
+                msg: params.get('msg'),
+                mainQ: params.get('mainQ'),
+                subQ: params.get('subQ')
+            };
+        }
         
         // --- NEW: Custom Question Logic ---
-        let mainQ = params.get('mainQ') || "will you go on a movie date with me?";
-        let subQ = params.get('subQ') || "I bought tickets!";
+        let mainQ = customData.mainQ || "will you go on a movie date with me?";
+        let subQ = customData.subQ || "I bought tickets!";
 
-        if (params.has('name')) {
-            document.getElementById('inviteTitle').innerHTML = params.get('name') + ", " + mainQ + " <br><em>" + subQ + "</em>";
+        if (customData.name) {
+            document.getElementById('inviteTitle').innerHTML = customData.name + ", " + mainQ + " <br><em>" + subQ + "</em>";
         } else {
-            let displayMain = params.has('mainQ') ? params.get('mainQ') : "Will you go on a movie date with me?";
+            let displayMain = customData.mainQ ? customData.mainQ : "Will you go on a movie date with me?";
             document.getElementById('inviteTitle').innerHTML = displayMain + " <br><em>" + subQ + "</em>";
         }
 
         // --- THEME SWAP LOGIC ---
-        const movieChoice = params.get('movie');
+        const movieChoice = customData.movie;
         if (movieChoice) {
             document.getElementById('movieName').textContent = movieChoice;
             
@@ -271,15 +294,16 @@
         }
 
         // --- DATE & LOCATION VISIBILITY LOGIC ---
-        if (window.location.search) {
-            const dateVal = params.get('date');
+        // If there is ANY parameter data, process the date and location
+        if (Object.keys(customData).length > 0 || window.location.search) {
+            const dateVal = customData.date;
             if (!dateVal || dateVal.trim() === "") {
                 document.getElementById('dateLine').style.display = 'none';
             } else {
                 document.getElementById('dateTime').textContent = dateVal;
             }
 
-            const locVal = params.get('loc');
+            const locVal = customData.loc;
             if (!locVal || locVal.trim() === "") {
                 document.getElementById('locLine').style.display = 'none';
             } else {
@@ -287,8 +311,8 @@
             }
         }
         
-        if (params.has('msg')) {
-            document.getElementById('modalMessage').innerHTML = params.get('msg');
+        if (customData.msg) {
+            document.getElementById('modalMessage').innerHTML = customData.msg;
         }
 
         // --- CHECK ANIMATION PREFERENCE ---
