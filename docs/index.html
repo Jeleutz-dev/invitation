@@ -301,26 +301,34 @@
 
         let splatTimer, pullTimer;
 
-        // The Smooth "Runaway" No Button Logic
-        noBtn.addEventListener('mouseover', function() {
-            if (this.style.position !== 'fixed') {
-                const rect = this.getBoundingClientRect();
-                document.body.appendChild(this);
-                this.style.position = 'fixed';
-                this.style.left = rect.left + 'px';
-                this.style.top = rect.top + 'px';
-                this.getBoundingClientRect(); 
+        // --- MOBILE-FRIENDLY RUNAWAY LOGIC ---
+        function runaway(e) {
+            // Prevent the default action so a tap doesn't register as a click
+            if (e) e.preventDefault();
+
+            if (noBtn.style.position !== 'fixed') {
+                const rect = noBtn.getBoundingClientRect();
+                document.body.appendChild(noBtn);
+                noBtn.style.position = 'fixed';
+                noBtn.style.left = rect.left + 'px';
+                noBtn.style.top = rect.top + 'px';
+                noBtn.getBoundingClientRect(); 
             }
 
-            const maxX = window.innerWidth - this.offsetWidth;
-            const maxY = window.innerHeight - this.offsetHeight;
+            const maxX = window.innerWidth - noBtn.offsetWidth;
+            const maxY = window.innerHeight - noBtn.offsetHeight;
             
             const randomX = Math.max(0, Math.floor(Math.random() * maxX));
             const randomY = Math.max(0, Math.floor(Math.random() * maxY));
             
-            this.style.left = randomX + 'px';
-            this.style.top = randomY + 'px';
-        });
+            noBtn.style.left = randomX + 'px';
+            noBtn.style.top = randomY + 'px';
+        }
+
+        // Bind the runaway function to mouse hover AND mobile touch/clicks
+        noBtn.addEventListener('mouseover', runaway);
+        noBtn.addEventListener('touchstart', runaway);
+        noBtn.addEventListener('click', runaway);
 
         // The "Yes" Button Action Sequence
         yesBtn.addEventListener('click', function() {
