@@ -31,7 +31,9 @@
         }
         h2 { margin-top: 0; color: #1a1a1a; text-align: center; }
         label { font-weight: 500; display: block; margin-top: 1rem; font-size: 0.9rem; color: #555; }
-        input[type="text"], textarea, select { 
+        
+        /* ADDED: input[type="datetime-local"] */
+        input[type="text"], input[type="datetime-local"], textarea, select { 
             width: 100%; 
             padding: 10px; 
             margin-top: 5px; 
@@ -93,7 +95,8 @@
         </select>
         
         <label>Date & Time</label>
-        <input type="text" id="genDate" value="August 1, 2026 @ 9:15 PM" placeholder="e.g., August 1, 2026 @ 9:15 PM">
+        <!-- UPDATED: Now it's a calendar picker! -->
+        <input type="datetime-local" id="genDate">
         
         <label>Location</label>
         <input type="text" id="genLoc" value="SM MOA ScreenX" placeholder="e.g., SM MOA Director's Club">
@@ -112,11 +115,23 @@
 
     <script>
         function generateLink() {
+            // --- NEW: Date Formatting Logic ---
+            let rawDate = document.getElementById('genDate').value;
+            let formattedDate = "";
+            
+            if (rawDate) {
+                let d = new Date(rawDate);
+                let datePart = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+                let timePart = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                // Combines into: "August 1, 2026 @ 9:15 PM"
+                formattedDate = datePart + " @ " + timePart;
+            }
+
             // 1. Gather all inputs into a single object
             const inviteData = {
                 name: document.getElementById('genName').value,
                 movie: document.getElementById('genMovie').value,
-                date: document.getElementById('genDate').value,
+                date: formattedDate, // Uses the pretty date we just built
                 loc: document.getElementById('genLoc').value,
                 msg: document.getElementById('genMsg').value,
                 mainQ: document.getElementById('genMainQ').value,
@@ -129,7 +144,8 @@
             });
 
             // 3. Convert object to a string, make URL safe, and scramble (Base64 Encode)
-            const encodedString = btoa(encodeURIComponent(JSON.stringify(inviteData)));
+            // Added an outer encodeURIComponent to guarantee safety against broken spaces
+            const encodedString = encodeURIComponent(btoa(encodeURIComponent(JSON.stringify(inviteData))));
 
             // 4. THE FIX: Hardcode the exact live GitHub URL including /invitation/
             let baseUrl = 'https://jeleutz-dev.github.io/invitation/';

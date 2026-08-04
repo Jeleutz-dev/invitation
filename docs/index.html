@@ -134,6 +134,32 @@
             opacity: 0;
         }
 
+        /* Magic Circle 1 (Left Side) */
+        .magic-circle-shoot {
+            position: fixed;
+            top: 75%; 
+            left: 25%; /* Left position */
+            width: 80vw; 
+            height: 80vh;
+            object-fit: contain; 
+            z-index: 2000; 
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        /* Magic Circle 2 (Right Side) */
+        .magic-circle-shoot-right {
+            position: fixed;
+            top: 75%; 
+            left: 75%; /* Right position */
+            width: 80vw; 
+            height: 80vh;
+            object-fit: contain; 
+            z-index: 2000; 
+            pointer-events: none;
+            opacity: 0;
+        }
+
         /* Web 2: The Splat */
         .web-splat {
             position: absolute;
@@ -183,6 +209,17 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
+        /* --- DOOMSDAY MAGIC CIRCLE ANIMATIONS --- */
+        @keyframes magicPopRotate {
+            0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 0; }
+            20% { transform: translate(-50%, -50%) scale(1.1) rotate(90deg); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1) rotate(720deg); opacity: 1; }
+        }
+        @keyframes magicVanish {
+            0% { transform: translate(-50%, -50%) scale(1) rotate(720deg); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(0) rotate(900deg); opacity: 0; }
+        }
+
         .modal-title {
             font-family: 'Playfair Display', serif;
             font-size: 2rem;
@@ -221,6 +258,18 @@
             <p><strong>Movie:</strong> <span class="highlight" id="movieName">Spiderman: Brand New Day</span></p>
             <p id="dateLine"><strong>Date & Time:</strong> <span id="dateTime">July 31, 2026 @ 9:15 PM</span></p>
             <p id="locLine"><strong>Location:</strong> <span id="locationPlace">SM MOA ScreenX</span></p>
+            
+            <!-- COUNTDOWN CONTAINER -->
+            <div id="countdownContainer" style="display: none; margin-top: 20px; margin-left: 20%; margin-right: 20%; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
+                <span style="font-size: 0.9rem; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px;">Time Remaining</span><br>
+                <span id="countdownText" class="highlight" style="font-size: 1.3rem; font-weight: 600;"></span>
+            </div>
+
+            <!-- NEW: MINI MAP CONTAINER -->
+            <div id="mapContainer" style="display: none; margin-top: 15px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                <!-- FIX: display: block; removes the gap at the bottom of the map -->
+                <iframe id="miniMap" width="100%" height="150" frameborder="0" style="border:0; display: block;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
+            </div>
         </div>
 
         <div class="buttons">
@@ -231,6 +280,9 @@
 
     <!-- Web String: Hidden by default, shoots from the camera -->
     <img src="./assets/wallpaper/web1.png" id="web1" class="web-shoot" alt="Web String">
+
+    <!-- Animation Image 2 (Always loaded, but remains invisible unless Doomsday is selected) -->
+    <img src="./assets/img/magic_effect.png" id="magic2" class="magic-circle-shoot-right" alt="Magic Circle 2">
 
     <!-- Modal Overlay -->
     <div class="modal-overlay" id="successModal">
@@ -248,17 +300,16 @@
         const params = new URLSearchParams(window.location.search);
         let customData = {};
 
-        // 1. Check if the URL uses the new scrambled "?invite=" format
         if (params.has('invite')) {
             try {
-                // Decode the Base64 string back into a workable Object
-                const decodedString = decodeURIComponent(atob(params.get('invite')));
+                // Decode the Base64 string back into a workable Object (YOUR EXACT WORKING CODE)
+                const safeBase64 = params.get('invite').replace(/ /g, '+'); // Added back safety net just in case
+                const decodedString = decodeURIComponent(atob(safeBase64));
                 customData = JSON.parse(decodedString);
             } catch (e) {
                 console.error("Invalid invite code");
             }
         } else {
-            // 2. FALLBACK: If it's an old link, grab data the old way so we don't break existing invites
             customData = {
                 name: params.get('name'),
                 movie: params.get('movie'),
@@ -270,7 +321,7 @@
             };
         }
         
-        // --- NEW: Custom Question Logic ---
+        // --- Custom Question Logic ---
         let mainQ = customData.mainQ || "will you go on a movie date with me?";
         let subQ = customData.subQ || "I bought tickets!";
 
@@ -283,58 +334,87 @@
 
         // --- THEME SWAP LOGIC ---
         const movieChoice = customData.movie;
+        let isDoomsday = false; 
+
         if (movieChoice) {
             document.getElementById('movieName').textContent = movieChoice;
             
-            // If they picked Doomsday, swap the background, icon, and colors
             if (movieChoice === 'Avengers: Doomsday') {
+                isDoomsday = true; 
                 document.body.classList.add('doomsday-theme');
                 document.getElementById('pageIcon').href = "./assets/dr-doom.png";
+
+                const web1 = document.getElementById('web1');
+                web1.src = "./assets/img/magic_effect.png";
+                web1.className = "magic-circle-shoot"; 
             }
         }
 
-        // --- DATE & LOCATION VISIBILITY LOGIC ---
-        // If there is ANY parameter data, process the date and location
+        // --- DATE, LOCATION, COUNTDOWN & MAP LOGIC ---
         if (Object.keys(customData).length > 0 || window.location.search) {
+            
+            // 1. Handle Date & Countdown
             const dateVal = customData.date;
             if (!dateVal || dateVal.trim() === "") {
                 document.getElementById('dateLine').style.display = 'none';
             } else {
                 document.getElementById('dateTime').textContent = dateVal;
+                
+                let cleanDateString = dateVal.replace('@', '').trim();
+                let countDownDate = new Date(cleanDateString).getTime();
+
+                if (!isNaN(countDownDate)) {
+                    document.getElementById('countdownContainer').style.display = 'block';
+
+                    let x = setInterval(function() {
+                        let now = new Date().getTime();
+                        let distance = countDownDate - now;
+
+                        if (distance < 0) {
+                            clearInterval(x);
+                            document.getElementById('countdownText').innerHTML = "It's Movie Time!";
+                        } else {
+                            let days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                            let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                            let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                            document.getElementById('countdownText').innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s";
+                        }
+                    }, 1000);
+                }
             }
 
+            // 2. Handle Location & Mini Map
             const locVal = customData.loc;
             if (!locVal || locVal.trim() === "") {
                 document.getElementById('locLine').style.display = 'none';
             } else {
                 document.getElementById('locationPlace').textContent = locVal;
+                
+                // Trigger the Google Map embed
+                document.getElementById('mapContainer').style.display = 'block';
+                // FIX: Added &t=m &z=15 so the map has a clear zoom level, enabling the interactive +/- buttons
+                document.getElementById('miniMap').src = 'https://maps.google.com/maps?q=' + encodeURIComponent(locVal) + '&t=m&z=14&output=embed';
             }
         }
         
         if (customData.msg) {
             document.getElementById('modalMessage').innerHTML = customData.msg;
         }
-
-        // --- CHECK ANIMATION PREFERENCE ---
-        let enableSpidey = true;
-        // Turn off webs automatically if the movie is Doomsday
-        if (movieChoice === 'Avengers: Doomsday') {
-            enableSpidey = false;
-        }
-        // ---------------------------
         
         const noBtn = document.getElementById('noBtn');
         const yesBtn = document.getElementById('yesBtn');
         const modal = document.getElementById('successModal');
         const web1 = document.getElementById('web1');
         const web2 = document.getElementById('web2');
+        const magic2 = document.getElementById('magic2'); 
         const modalContent = document.querySelector('.modal-content');
 
         let splatTimer, pullTimer;
 
         // --- MOBILE-FRIENDLY RUNAWAY LOGIC ---
         function runaway(e) {
-            // Prevent the default action so a tap doesn't register as a click
             if (e) e.preventDefault();
 
             if (noBtn.style.position !== 'fixed') {
@@ -356,7 +436,6 @@
             noBtn.style.top = randomY + 'px';
         }
 
-        // Bind the runaway function to mouse hover AND mobile touch/clicks
         noBtn.addEventListener('mouseover', runaway);
         noBtn.addEventListener('touchstart', runaway);
         noBtn.addEventListener('click', runaway);
@@ -365,12 +444,28 @@
         yesBtn.addEventListener('click', function() {
             web1.style.animation = 'none';
             web2.style.animation = 'none';
+            magic2.style.animation = 'none';
             modalContent.style.animation = 'none';
+            
             void web1.offsetWidth; 
+            void magic2.offsetWidth;
 
             modal.classList.add('active');
             
-            if (enableSpidey) {
+            if (isDoomsday) {
+                // --- DOOMSDAY MAGIC SEQUENCE (Both Circles) ---
+                web1.style.animation = 'magicPopRotate 1.5s ease-out forwards';
+                magic2.style.animation = 'magicPopRotate 1.5s ease-out forwards'; 
+                
+                splatTimer = setTimeout(() => {
+                    web1.style.animation = 'magicVanish 0.3s ease-in forwards';
+                    magic2.style.animation = 'magicVanish 0.3s ease-in forwards'; 
+                    
+                    pullTimer = setTimeout(() => {
+                        modalContent.style.animation = 'pullModal 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+                    }, 300); 
+                }, 1500); 
+            } else {
                 // RUN FULL SPIDERMAN ANIMATION
                 web1.style.animation = 'shootWeb 0.25s ease-out forwards';
                 splatTimer = setTimeout(() => {
@@ -381,9 +476,6 @@
                         modalContent.style.animation = 'pullModal 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
                     }, 250); 
                 }, 250); 
-            } else {
-                // SKIP WEBS, JUST POP THE MODAL OPEN
-                modalContent.style.animation = 'pullModal 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
             }
         });
 
@@ -395,6 +487,7 @@
                 clearTimeout(pullTimer);
                 web1.style.animation = 'none';
                 web2.style.animation = 'none';
+                magic2.style.animation = 'none'; 
                 modalContent.style.animation = 'none';
             }
         });
