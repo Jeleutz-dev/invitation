@@ -437,15 +437,15 @@
             };
         }
         
-        let mainQ = customData.mainQ || "will you go on a movie date with me?";
-        let subQ = customData.subQ || "I bought tickets!";
+        // --- FIXED: Custom Question Logic Using "??" ---
+        let mainQ = customData.mainQ ?? "Will you go on a movie date with me?";
+        let subQ = customData.subQ ?? "I bought tickets!";
 
-        if (customData.name) {
-            document.getElementById('inviteTitle').innerHTML = customData.name + ", " + mainQ + " <em>" + subQ + "</em>";
-        } else {
-            let displayMain = customData.mainQ ? customData.mainQ : "Will you go on a movie date with me?";
-            document.getElementById('inviteTitle').innerHTML = displayMain + " <em>" + subQ + "</em>";
-        }
+        // Ensure we don't render empty tags if they are blank
+        let nameStr = (customData.name && customData.name.trim() !== "") ? customData.name + ", " : "";
+        let subQStr = (subQ && subQ.trim() !== "") ? "<br><em>" + subQ + "</em>" : "";
+
+        document.getElementById('inviteTitle').innerHTML = nameStr + mainQ + subQStr;
 
         // --- THEME SWAP LOGIC ---
         const movieChoice = customData.movie;
@@ -468,6 +468,10 @@
                 isInsidious = true;
                 document.body.classList.add('insidious-theme');
                 document.getElementById('pageIcon').href = "./assets/ghost.png";
+
+                // --- Change button text for the horror theme! ---
+                document.getElementById('yesBtn').textContent = "Enter the Further";
+                document.getElementById('noBtn').textContent = "Too scared!";
             }
         }
 
@@ -513,7 +517,8 @@
             }
         }
         
-        if (customData.msg) {
+        // --- FIXED: Modal Message Logic ---
+        if (customData.msg !== undefined && customData.msg !== null) {
             document.getElementById('modalMessage').innerHTML = customData.msg;
         }
         
