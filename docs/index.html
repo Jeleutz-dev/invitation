@@ -49,22 +49,22 @@
         /* --- MAIN QUESTION STYLES --- */
         h1 {
             font-family: 'Playfair Display', serif;
-            font-size: 2.2rem; /* <-- Change Main Question Size Here */
+            font-size: 2.4rem; 
             color: #ffffff;
             margin-bottom: 2rem;
             line-height: 1.2;
             text-shadow: 0 2px 15px rgba(255, 255, 255, 0.15);
         }
 
-        /* --- SUB QUESTION STYLES (RESTORED BEAUTIFUL FONT) --- */
+        /* --- SUB QUESTION STYLES --- */
         h1 em {
-            font-size: 1.4rem; /* <-- Change Sub Question Size Here */
-            font-family: 'Playfair Display', serif; /* Restored the elegant font! */
+            font-size: 1.4rem; 
+            font-family: 'Playfair Display', serif; 
             font-style: italic;
             font-weight: 400;
-            color: #d1d1d1; /* Slightly dimmed white */
-            display: block; /* Forces it nicely onto the next line */
-            margin-top: 8px; /* Space between main and sub */
+            color: #d1d1d1; 
+            display: block; 
+            margin-top: 8px; 
             letter-spacing: 0.5px;
         }
 
@@ -88,6 +88,7 @@
             position: relative;
         }
 
+        /* FIX: Reverted to generic button to restore the smooth "No" dodge animation! */
         button {
             padding: 12px 36px;
             font-size: 1.1rem;
@@ -113,6 +114,7 @@
         .btn-no {
             background-color: #2B5292; 
             color: white;
+            /* Smooth glide animation is back! */
             transition: left 0.4s ease-out, top 0.4s ease-out, transform 0.2s, background-color 0.2s;
             z-index: 50;
         }
@@ -178,9 +180,48 @@
             opacity: 0;
         }
 
+        /* --- INTENSE JUMPSCARE STYLES --- */
+        .blackout-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            z-index: 10;
+            opacity: 0; 
+            pointer-events: none;
+        }
+
+        .teal-fog {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(13, 89, 89, 0.5) 0%, rgba(4, 26, 26, 0.7) 40%, transparent 70%);
+            z-index: 15; 
+            opacity: 0;
+            pointer-events: none;
+            filter: blur(30px);
+        }
+
+        .jumpscare-img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            z-index: 20; 
+            pointer-events: none;
+            opacity: 0;
+            width: 80vw;
+            max-width: 400px; 
+            filter: drop-shadow(0 0 25px rgba(0, 150, 150, 0.6));
+        }
+
         .modal-content {
             position: relative;
-            z-index: 2; 
+            z-index: 30; 
             background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(18px);
             -webkit-backdrop-filter: blur(18px); 
@@ -223,6 +264,42 @@
             0% { transform: translate(-50%, -50%) scale(1) rotate(720deg); opacity: 1; }
             100% { transform: translate(-50%, -50%) scale(0) rotate(900deg); opacity: 0; }
         }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- INTENSE JUMPSCARE ANIMATIONS --- */
+        @keyframes flickerBlack {
+            0% { opacity: 0; }
+            15% { opacity: 0.8; }
+            30% { opacity: 0; }
+            45% { opacity: 0.9; }
+            60% { opacity: 0.2; }
+            80% { opacity: 1; }
+            90% { opacity: 0.5; }
+            100% { opacity: 1; } 
+        }
+        
+        @keyframes driftFog {
+            0% { opacity: 0; transform: scale(1) translate(0, 0); }
+            20% { opacity: 1; transform: scale(1.1) translate(-2%, 2%); }
+            80% { opacity: 1; transform: scale(1.3) translate(2%, -2%); }
+            100% { opacity: 0; transform: scale(1.5) translate(-4%, 4%); }
+        }
+
+        @keyframes fadeBlackout {
+            0% { opacity: 1; }
+            100% { opacity: 0; } 
+        }
+
+        @keyframes snapJumpscare {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            10% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; } 
+            20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; } 
+            75% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; } 
+            100% { transform: translate(-50%, -50%) scale(5); opacity: 0; } 
+        }
 
         .modal-title {
             font-family: 'Playfair Display', serif;
@@ -233,7 +310,7 @@
         }
 
         /* --- DOOMSDAY THEME OVERRIDES --- */
-       body.doomsday-theme {
+        body.doomsday-theme {
             background-image: url('./assets/wallpaper/doomsday_bg.png') !important;
         }
         .doomsday-theme .highlight {
@@ -252,45 +329,50 @@
             text-shadow: 0 0 10px rgba(46, 204, 113, 0.3);
         }
 
-        /* --- MOBILE RESPONSIVENESS MEDIA QUERIES --- */
-        @media (max-width: 600px) {
-            body {
-                padding: 15px; 
-            }
-            .card {
-                padding: 2rem 1.5rem; 
-            }
-            
-            /* MOBILE TEXT SIZES */
-            h1 {
-                font-size: 1.8rem; /* Mobile Main Question */
-                margin-bottom: 1.5rem;
-            }
-            h1 em {
-                font-size: 1.2rem; /* Mobile Sub Question */
-                margin-top: 5px;
-            }
+        /* --- INSIDIOUS THEME OVERRIDES --- */
+        body.insidious-theme {
+            background-image: url('./assets/wallpaper/insidious_bg.png') !important;
+        }
+        .insidious-theme .highlight {
+            color: #8b0000; 
+            text-shadow: 0 0 12px rgba(139, 0, 0, 0.6);
+        }
+        .insidious-theme .btn-yes {
+            background-color: #4a0000; 
+            box-shadow: 0 4px 15px rgba(74, 0, 0, 0.5);
+        }
+        .insidious-theme .btn-yes:hover {
+            background-color: #2b0000;
+        }
+        .insidious-theme .modal-title {
+            color: #8b0000;
+            text-shadow: 0 0 12px rgba(139, 0, 0, 0.6);
+        }
+        .insidious-theme .btn-no {
+            background-color: #333333; 
+        }
 
-            .details {
-                font-size: 0.95rem; 
-            }
-            .buttons {
-                gap: 10px; 
-            }
-            button {
-                padding: 12px 24px; 
-                font-size: 1rem;
-            }
-            .modal-content {
-                padding: 2rem 1.5rem;
-            }
-            .modal-title {
-                font-size: 1.6rem;
-            }
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 600px) {
+            body { padding: 15px; }
+            .card { padding: 2rem 1.5rem; }
+            h1 { font-size: 1.8rem; margin-bottom: 1.5rem; }
+            h1 em { font-size: 1.2rem; margin-top: 5px; }
+            .details { font-size: 0.95rem; }
+            .buttons { gap: 10px; }
+            button { padding: 12px 24px; font-size: 1rem; }
+            .modal-content { padding: 2rem 1.5rem; }
+            .modal-title { font-size: 1.6rem; }
         }
     </style>
 </head>
 <body>
+
+    <!-- AUDIO ELEMENT FOR THE SCREAM FX -->
+    <audio id="screamSound">
+        <!-- Make sure your scream sound file is exactly named scream.mp3 -->
+        <source src="./assets/effects/scream.mp3" type="audio/mpeg">
+    </audio>
 
     <div class="card">
         <h1 id="inviteTitle">Will you go on a movie date with me? <br><em>I bought tickets!</em></h1>
@@ -300,13 +382,11 @@
             <p id="dateLine"><strong>Date & Time:</strong> <span id="dateTime">July 31, 2026 @ 9:15 PM</span></p>
             <p id="locLine"><strong>Location:</strong> <span id="locationPlace">SM MOA ScreenX</span></p>
             
-            <!-- COUNTDOWN CONTAINER -->
             <div id="countdownContainer" style="display: none; margin: 20px auto 0 auto; width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
                 <span style="font-size: 0.9rem; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px;">Time Remaining</span><br>
                 <span id="countdownText" class="highlight" style="font-size: 1.3rem; font-weight: 600;"></span>
             </div>
 
-            <!-- MINI MAP CONTAINER -->
             <div id="mapContainer" style="display: none; margin-top: 15px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
                 <iframe id="miniMap" width="100%" height="150" frameborder="0" style="border:0; display: block;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
             </div>
@@ -316,19 +396,20 @@
             <button class="btn-yes" id="yesBtn">Yes</button>
             <button class="btn-no" id="noBtn">No</button>
         </div>
+        
+        <div id="cheekyText" style="display: none; margin-top: 20px; font-size: 0.95rem; font-style: italic; color: #f5f5f5; opacity: 0.9; animation: fadeIn 0.5s ease-out forwards;"></div>
     </div>
 
-    <!-- Web String: Hidden by default, shoots from the camera -->
     <img src="./assets/wallpaper/web1.png" id="web1" class="web-shoot" alt="Web String">
-
-    <!-- Animation Image 2 (Always loaded, but remains invisible unless Doomsday is selected) -->
     <img src="./assets/img/magic_effect.png" id="magic2" class="magic-circle-shoot-right" alt="Magic Circle 2">
 
-    <!-- Modal Overlay -->
     <div class="modal-overlay" id="successModal">
-        <!-- Splat Image -->
         <img src="./assets/wallpaper/web2.png" id="web2" class="web-splat" alt="Web Splat">
         
+        <div id="blackout" class="blackout-screen"></div>
+        <div id="tealFog" class="teal-fog"></div>
+        <img src="./assets/img/cute_ghost.png" id="jumpscareImage" class="jumpscare-img" alt="Boo!">
+
         <div class="modal-content">
             <div class="modal-title">It's a Date!</div>
             <p id="modalMessage">Best decision you've made all day!<br>See you on the 1st of August!</p>
@@ -336,7 +417,7 @@
     </div>
     
     <script>
-        // --- URL PARAMETER LOGIC (WITH BASE64 DECODING) ---
+        // --- URL PARAMETER LOGIC ---
         const params = new URLSearchParams(window.location.search);
         let customData = {};
 
@@ -350,21 +431,15 @@
             }
         } else {
             customData = {
-                name: params.get('name'),
-                movie: params.get('movie'),
-                date: params.get('date'),
-                loc: params.get('loc'),
-                msg: params.get('msg'),
-                mainQ: params.get('mainQ'),
-                subQ: params.get('subQ')
+                name: params.get('name'), movie: params.get('movie'),
+                date: params.get('date'), loc: params.get('loc'),
+                msg: params.get('msg'), mainQ: params.get('mainQ'), subQ: params.get('subQ')
             };
         }
         
-        // --- Custom Question Logic ---
         let mainQ = customData.mainQ || "will you go on a movie date with me?";
         let subQ = customData.subQ || "I bought tickets!";
 
-        // Notice we removed the extra <br> here, because our CSS handles the spacing gracefully now!
         if (customData.name) {
             document.getElementById('inviteTitle').innerHTML = customData.name + ", " + mainQ + " <em>" + subQ + "</em>";
         } else {
@@ -375,6 +450,7 @@
         // --- THEME SWAP LOGIC ---
         const movieChoice = customData.movie;
         let isDoomsday = false; 
+        let isInsidious = false; 
 
         if (movieChoice) {
             document.getElementById('movieName').textContent = movieChoice;
@@ -387,13 +463,16 @@
                 const web1 = document.getElementById('web1');
                 web1.src = "./assets/img/magic_effect.png";
                 web1.className = "magic-circle-shoot"; 
+            } 
+            else if (movieChoice === 'Insidious: Out of the Further') {
+                isInsidious = true;
+                document.body.classList.add('insidious-theme');
+                document.getElementById('pageIcon').href = "./assets/ghost.png";
             }
         }
 
-        // --- DATE, LOCATION, COUNTDOWN & MAP LOGIC ---
+        // --- DATE, LOCATION & COUNTDOWN ---
         if (Object.keys(customData).length > 0 || window.location.search) {
-            
-            // 1. Handle Date & Countdown
             const dateVal = customData.date;
             if (!dateVal || dateVal.trim() === "") {
                 document.getElementById('dateLine').style.display = 'none';
@@ -418,20 +497,17 @@
                             let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                             let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                             let seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
                             document.getElementById('countdownText').innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s";
                         }
                     }, 1000);
                 }
             }
 
-            // 2. Handle Location & Mini Map
             const locVal = customData.loc;
             if (!locVal || locVal.trim() === "") {
                 document.getElementById('locLine').style.display = 'none';
             } else {
                 document.getElementById('locationPlace').textContent = locVal;
-                
                 document.getElementById('mapContainer').style.display = 'block';
                 document.getElementById('miniMap').src = 'https://maps.google.com/maps?q=' + encodeURIComponent(locVal) + '&t=m&z=14&output=embed';
             }
@@ -447,13 +523,51 @@
         const web1 = document.getElementById('web1');
         const web2 = document.getElementById('web2');
         const magic2 = document.getElementById('magic2'); 
+        const blackout = document.getElementById('blackout');
+        const tealFog = document.getElementById('tealFog'); 
         const modalContent = document.querySelector('.modal-content');
+        const jumpscareImg = document.getElementById('jumpscareImage');
+        const screamSound = document.getElementById('screamSound');
+        
+        // --- RANDOMIZED BUTTON LOGIC ---
+        const cheekyText = document.getElementById('cheekyText');
+        let dodgeCount = 0;
+
+        const finalCheekyPhrases = [
+            "The universe has spoken. Just click 'Yes' already! ✨",
+            "Resistance is futile. See you on our date! 😎",
+            "I deleted the 'No' button. You're stuck with me! 💖",
+            "Guess it's a date then! You literally have no choice now. 🤷‍♂️",
+            "Well, this is awkward... just click Yes so we can move on. 😂",
+            "Checkmate. See you at the movies! 🎬",
+            "I admire your persistence, but we're still going. 🍿"
+        ];
+
+        let randomDodges = [
+            "Too slow! 🐢", "Catch me! 🦋", "Nope! 🏃💨", "Missed! 😛", "Oops! 🙈"
+        ];
+
+        for (let i = randomDodges.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [randomDodges[i], randomDodges[j]] = [randomDodges[j], randomDodges[i]];
+        }
+        randomDodges.push("I'm tired... 🪫");
 
         let splatTimer, pullTimer;
 
-        // --- MOBILE-FRIENDLY RUNAWAY LOGIC ---
         function runaway(e) {
             if (e) e.preventDefault();
+
+            if (dodgeCount >= 6) {
+                noBtn.style.display = 'none'; 
+                const randomText = finalCheekyPhrases[Math.floor(Math.random() * finalCheekyPhrases.length)];
+                cheekyText.textContent = randomText;
+                cheekyText.style.display = 'block'; 
+                return; 
+            }
+
+            noBtn.textContent = randomDodges[dodgeCount];
+            dodgeCount++; 
 
             if (noBtn.style.position !== 'fixed') {
                 const rect = noBtn.getBoundingClientRect();
@@ -461,7 +575,7 @@
                 noBtn.style.position = 'fixed';
                 noBtn.style.left = rect.left + 'px';
                 noBtn.style.top = rect.top + 'px';
-                noBtn.getBoundingClientRect(); 
+                noBtn.getBoundingClientRect(); // Forces layout recalculation to ensure transition works
             }
 
             const maxX = window.innerWidth - noBtn.offsetWidth;
@@ -478,46 +592,76 @@
         noBtn.addEventListener('touchstart', runaway);
         noBtn.addEventListener('click', runaway);
 
-        // The "Yes" Button Action Sequence
+        // --- THE "YES" ACTION ---
         yesBtn.addEventListener('click', function() {
             web1.style.animation = 'none';
             web2.style.animation = 'none';
             magic2.style.animation = 'none';
             modalContent.style.animation = 'none';
+            jumpscareImg.style.animation = 'none'; 
+            blackout.style.animation = 'none';
+            tealFog.style.animation = 'none';
             
             void web1.offsetWidth; 
             void magic2.offsetWidth;
 
-            modal.classList.add('active');
-            
-            if (isDoomsday) {
-                // --- DOOMSDAY MAGIC SEQUENCE ---
-                web1.style.animation = 'magicPopRotate 1.5s ease-out forwards';
-                magic2.style.animation = 'magicPopRotate 1.5s ease-out forwards'; 
+            if (isInsidious) {
+                modal.style.transition = 'none'; 
+                modal.classList.add('active');
+
+                // 1. Light flicker
+                blackout.style.animation = 'flickerBlack 0.8s ease-in-out forwards';
                 
+                // 2. Teal fog
+                setTimeout(() => {
+                    tealFog.style.animation = 'driftFog 2.5s ease-in-out forwards';
+                }, 400);
+
+                // 3. JUMPSCARE & SCREAM!
                 splatTimer = setTimeout(() => {
-                    web1.style.animation = 'magicVanish 0.3s ease-in forwards';
-                    magic2.style.animation = 'magicVanish 0.3s ease-in forwards'; 
-                    
-                    pullTimer = setTimeout(() => {
-                        modalContent.style.animation = 'pullModal 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
-                    }, 300); 
-                }, 1500); 
+                    screamSound.currentTime = 0; 
+                    screamSound.play().catch(e => console.log("Audio block: user didn't interact properly."));
+                    jumpscareImg.style.animation = 'snapJumpscare 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+                }, 800);
+                
+                // 4. Fade to modal
+                pullTimer = setTimeout(() => {
+                    blackout.style.animation = 'fadeBlackout 0.8s ease-out forwards';
+                    modalContent.style.animation = 'pullModal 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+                }, 1800); 
+
             } else {
-                // --- SPIDERMAN ANIMATION ---
-                web1.style.animation = 'shootWeb 0.25s ease-out forwards';
-                splatTimer = setTimeout(() => {
-                    web2.style.animation = 'splatIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
-                    pullTimer = setTimeout(() => {
-                        web1.style.animation = 'pullOutWeb 0.25s ease-in forwards';
-                        web2.style.animation = 'pullOutWeb 0.25s ease-in forwards';
-                        modalContent.style.animation = 'pullModal 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+                modal.style.transition = 'opacity 0.4s ease, visibility 0.4s ease';
+                modal.classList.add('active');
+
+                if (isDoomsday) {
+                    web1.style.animation = 'magicPopRotate 1.5s ease-out forwards';
+                    magic2.style.animation = 'magicPopRotate 1.5s ease-out forwards'; 
+                    
+                    splatTimer = setTimeout(() => {
+                        web1.style.animation = 'magicVanish 0.3s ease-in forwards';
+                        magic2.style.animation = 'magicVanish 0.3s ease-in forwards'; 
+                        
+                        pullTimer = setTimeout(() => {
+                            modalContent.style.animation = 'pullModal 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+                        }, 300); 
+                    }, 1500); 
+                } 
+                else {
+                    web1.style.animation = 'shootWeb 0.25s ease-out forwards';
+                    splatTimer = setTimeout(() => {
+                        web2.style.animation = 'splatIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+                        pullTimer = setTimeout(() => {
+                            web1.style.animation = 'pullOutWeb 0.25s ease-in forwards';
+                            web2.style.animation = 'pullOutWeb 0.25s ease-in forwards';
+                            modalContent.style.animation = 'pullModal 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+                        }, 250); 
                     }, 250); 
-                }, 250); 
+                }
             }
         });
 
-        // Close Modal on Outside Click
+        // Close Modal
         modal.addEventListener('click', function(e) {
             if (e.target === modal) {
                 modal.classList.remove('active');
@@ -527,6 +671,9 @@
                 web2.style.animation = 'none';
                 magic2.style.animation = 'none'; 
                 modalContent.style.animation = 'none';
+                jumpscareImg.style.animation = 'none'; 
+                blackout.style.animation = 'none';
+                tealFog.style.animation = 'none';
             }
         });
     </script>
